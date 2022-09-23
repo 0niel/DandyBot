@@ -2,6 +2,4 @@
 
 
 def script(check, x, y):
-    if check(Entities.LEVEL) == 1:
-        return Actions.RIGHT
-    return Actions.PASS
+    return Actions.RIGHT if check(Entities.LEVEL) == 1 else Actions.PASS

@@ -28,12 +28,11 @@ class Board:
         self.players = []
         for i, name in enumerate(self.game["players"]):
             try:
-                script = import_module('bots.' + name).script
+                script = import_module(f'bots.{name}').script
                 tile = self.game["tiles"]["@"][i]
                 self.players.append(Player(name, script, self, tile))
             except ModuleNotFoundError:
-                raise BotNotFoundError(
-                    "Bot with name '{}' not found".format(name))
+                raise BotNotFoundError(f"Bot with name '{name}' not found")
             except KeyError:
                 raise TilesConfigError(
                     "Tiles config are empty or set incorrectly")
@@ -46,18 +45,16 @@ class Board:
         try:
             self.level = self.game["levels"][self.level_index]
         except IndexError:
-            raise LevelNotFoundError(
-                "Level with index {} not found".format(self.level_index))
+            raise LevelNotFoundError(f"Level with index {self.level_index} not found")
 
         try:
             data = self.game["maps"][self.level["map"]]
         except IndexError:
-            raise MapNotFoundError(
-                "Map with index {} not found".format(self.level["map"]))
+            raise MapNotFoundError(f'Map with index {self.level["map"]} not found')
 
         cols, rows = len(data[0]), len(data)
         self.map = [[data[y][x] for y in range(rows)] for x in range(cols)]
-        self.has_player = [[None for y in range(rows)] for x in range(cols)]
+        self.has_player = [[None for _ in range(rows)] for _ in range(cols)]
         self.canvas.config(width=cols * self.tileset["tile_width"] * SCALE,
                            height=rows * self.tileset["tile_height"] * SCALE)
         self.screen.resize(cols, rows)
@@ -106,8 +103,7 @@ class Board:
         elif cmd == Entities.PLAYER:
             return item != "#" and self.has_player[x][y]
         elif cmd != Entities.EMPTY:
-            raise EntitiyNotFoundError(
-                "The entity '{}' does not exist".format(cmd))
+            raise EntitiyNotFoundError(f"The entity '{cmd}' does not exist")
 
     def play(self):
         for p in self.players:
@@ -120,8 +116,7 @@ class Board:
     def update_score(self):
         lines = [("Level:%4d\n" % (self.level_index + 1))]
         players = sorted(self.players, key=lambda x: x.gold, reverse=True)
-        for p in players:
-            lines.append("%s:%4d" % (p.name, p.gold))
+        lines.extend("%s:%4d" % (p.name, p.gold) for p in players)
         self.label["text"] = "\n".join(lines)
 
     def select_next_level(self):
@@ -154,8 +149,7 @@ class Player:
         elif cmd == Actions.TAKE:
             self.take()
         elif cmd != Actions.PASS:
-            raise ActionNotFoundError(
-                "The action '{}' does not exist".format(cmd))
+            raise ActionNotFoundError(f"The action '{cmd}' does not exist")
         self.move(dx, dy)
 
     def move(self, dx, dy):
@@ -167,8 +161,7 @@ class Player:
         board.add_player(self, self.x, self.y)
 
     def take(self):
-        gold = self.board.check(Entities.GOLD, self.x, self.y)
-        if gold:
+        if gold := self.board.check(Entities.GOLD, self.x, self.y):
             self.gold += gold
             self.board.take_gold(self.x, self.y)
 
