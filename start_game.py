@@ -6,6 +6,6 @@ if __name__ == '__main__':
     try:
         start_game()
     except GameExceptions as ex:
-        print('[GAME ERROR] ' + str(ex))
+        print(f'[GAME ERROR] {str(ex)}')
     except Exception as ex:
-        print('An unhandled game error! Message: ' + str(ex))
+        print(f'An unhandled game error! Message: {str(ex)}')

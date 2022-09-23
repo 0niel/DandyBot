@@ -26,11 +26,12 @@ class PliTk:
         self.x, self.y = x, y
         self.tileset = tileset
         self.scale = scale
-        self.images = []
         self.tiles = []
-        for i in range(tileset["size"]):
-            self.images.append(tk.PhotoImage(
-                data=get_tile_ppm(tileset, i)).zoom(scale))
+        self.images = [
+            tk.PhotoImage(data=get_tile_ppm(tileset, i)).zoom(scale)
+            for i in range(tileset["size"])
+        ]
+
         self.resize(cols, rows)
 
     def resize(self, cols, rows):
